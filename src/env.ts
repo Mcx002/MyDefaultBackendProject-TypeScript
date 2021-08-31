@@ -72,4 +72,8 @@ export const env = {
         username: getOsEnv('MONITOR_USERNAME'),
         password: getOsEnv('MONITOR_PASSWORD'),
     },
+    passport: {
+        secretKey: process.env.JWT_SECRET_KEY,
+        expiration: process.env.JWT_EXPIRATION,
+    },
 };

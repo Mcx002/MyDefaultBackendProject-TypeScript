@@ -133,7 +133,7 @@ module.exports = {
                 script: series(
                     'nps banner.migrate',
                     'nps config',
-                    runFast('./node_modules/typeorm/cli.js migration:run')
+                    runFast('./node_modules/typeorm/cli.js schema:sync')
                 ),
                 description: 'Migrates the database to newest version available'
             },
@@ -161,7 +161,7 @@ module.exports = {
                 script: series(
                     'nps db.drop',
                     'nps db.migrate',
-                    'nps db.seed'
+                    // 'nps db.seed'
                 ),
                 description: 'Recreates the database with seeded data'
             }

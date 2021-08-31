@@ -1,9 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { IsNotEmpty } from 'class-validator';
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
-import { Pet } from './Pet';
+export enum UserStat {
+    member, admin,
+}
 
 @Entity()
 export class User {
@@ -51,8 +53,9 @@ export class User {
     @Column()
     public username: string;
 
-    @OneToMany(type => Pet, pet => pet.user)
-    public pets: Pet[];
+    @IsNotEmpty()
+    @Column({default: UserStat.member})
+    public user_stat: UserStat;
 
     public toString(): string {
         return `${this.firstName} ${this.lastName} (${this.email})`;

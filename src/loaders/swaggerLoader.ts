@@ -29,9 +29,14 @@ export const swaggerLoader: MicroframeworkLoader = (settings: MicroframeworkSett
                 components: {
                     schemas,
                     securitySchemes: {
-                        basicAuth: {
+                        // basicAuth: {
+                        //     type: 'http',
+                        //     scheme: 'basic',
+                        // },
+                        bearerAuth: {
                             type: 'http',
-                            scheme: 'basic',
+                            scheme: 'bearer',
+                            bearerFormat: 'JWT',
                         },
                     },
                 },

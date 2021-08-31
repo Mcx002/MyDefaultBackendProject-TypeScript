@@ -2,7 +2,7 @@ import { Connection } from 'typeorm';
 import { Factory, Seed } from 'typeorm-seeding';
 import * as uuid from 'uuid';
 
-import { User } from '../../../src/api/models/User';
+import {User, UserStat} from '../../../src/api/models/User';
 
 export class CreateBruce implements Seed {
 
@@ -31,11 +31,12 @@ export class CreateBruce implements Seed {
 
         const user = new User();
         user.id = uuid.v1();
-        user.firstName = 'Bruce';
-        user.lastName = 'Wayne';
-        user.email = 'bruce.wayne@wayne-enterprises.com';
-        user.username = 'bruce';
-        user.password = '1234';
+        user.firstName = 'Muchlish';
+        user.lastName = 'Choruddin';
+        user.email = 'muchlishchoeruddin96@gmail.com';
+        user.username = 'Mcx002';
+        user.password = 'admin1234';
+        user.user_stat = UserStat.admin;
         return await em.save(user);
     }
 
