@@ -1,6 +1,5 @@
 import { Field, ID, ObjectType } from 'type-graphql';
 
-
 @ObjectType({
     description: 'User object.',
 })

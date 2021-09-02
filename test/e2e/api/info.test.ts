@@ -3,7 +3,7 @@ import request from 'supertest';
 import { env } from '../../../src/env';
 import { bootstrapApp, BootstrapSettings } from '../utils/bootstrap';
 
-describe('/api', () => {
+describe('/', () => {
 
     // -------------------------------------------------------------------------
     // Setup up
@@ -18,7 +18,7 @@ describe('/api', () => {
 
     test('GET: / should return the api-version', async (done) => {
         const response = await request(settings.app)
-            .get('/api')
+            .get('/')
             .expect('Content-Type', /json/)
             .expect(200);
 

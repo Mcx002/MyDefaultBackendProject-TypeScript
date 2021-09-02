@@ -1,12 +1,15 @@
 import * as express from 'express';
-import { Service } from 'typedi';
-import { OrmRepository } from 'typeorm-typedi-extensions';
+import {Service} from 'typedi';
+import {OrmRepository} from 'typeorm-typedi-extensions';
 
-import { User } from '../api/models/User';
-import { UserRepository } from '../api/repositories/UserRepository';
-import { Logger, LoggerInterface } from '../decorators/Logger';
+import {User} from '../api/models/User';
+import {UserRepository} from '../api/repositories/UserRepository';
+import {Logger, LoggerInterface} from '../decorators/Logger';
 import * as jwt from 'jsonwebtoken';
 import {env} from '../env';
+import {SignInRequest} from '../api/controllers/requests/AuthRequests';
+import {UnauthorizedError} from 'routing-controllers';
+import {AuthResponse} from '../api/controllers/responses/AuthResponses';
 
 @Service()
 export class AuthService {
@@ -16,47 +19,56 @@ export class AuthService {
         @OrmRepository() private userRepository: UserRepository
     ) { }
 
-    public async parseAuthFromRequest(req: express.Request, roles: any[]): Promise<{ username: string, password: string } | User> {
-        const authorization = req.header('authorization');
-
-        if (authorization && authorization.split(' ')[0] === 'Basic') {
-            this.log.info('Credentials provided by the client');
-            const decodedBase64 = Buffer.from(authorization.split(' ')[1], 'base64').toString('ascii');
-            const username = decodedBase64.split(':')[0];
-            const password = decodedBase64.split(':')[1];
-            if (username && password) {
-                return { username, password };
-            }
-            this.log.info('No credentials provided by the client');
+    public async signin(req: SignInRequest): Promise<AuthResponse> {
+        const user = await this.userRepository.findOne({username: req.username});
+        if (user !== undefined && await User.comparePassword(user, req.password)) {
+            return {
+                user,
+                token: this.registAuthToken(user.id),
+            };
+        } else {
+            throw new UnauthorizedError();
         }
+    }
+
+    public registAuthToken(id: string): string {
+        return jwt.sign({
+            id,
+            version: env.app.version,
+        }, env.passport.secretKey, (env.passport.expiration ? {
+            expiresIn: env.passport.expiration,
+        } : undefined));
+    }
+
+    public async parseAuthFromRequest(req: express.Request): Promise<{id: string, version: string}> {
+        const authorization = req.header('authorization');
 
         if (authorization && authorization.split(' ')[0] === 'Bearer') {
             const token = authorization.split(' ')[1];
-            const decoded = jwt.verify(token, env.passport.secretKey) as any;
-            const user = await this.userRepository.findOne({id: decoded.id});
-
-            if (user && !roles.length) {
-                return user;
+            if (token !== undefined) {
+                try {
+                    const decoded = jwt.verify(token, env.passport.secretKey) as any;
+                    if (decoded) {
+                        return decoded;
+                    }
+                } catch (e) {
+                    this.log.warn('Token is invalid');
+                }
+            } else {
+                this.log.info('There is no token passed');
             }
-            if (user && roles.find(role => role === user.user_stat)) {
-                return user;
-            }
-            this.log.info('No User founded by token');
         }
         return undefined;
     }
 
-    public async validateUser(username: string, password: string): Promise<User> {
-        const user = await this.userRepository.findOne({
-            where: {
-                username,
-            },
-        });
-
-        if (await User.comparePassword(user, password)) {
+    public async validateUser(id: string, roles: any[]): Promise<User> {
+        const user = await this.userRepository.findOne(id);
+        if (user && !roles.length) {
             return user;
         }
-
+        if (user && roles.find(role => role === user.user_stat)) {
+            return user;
+        }
         return undefined;
     }
 }

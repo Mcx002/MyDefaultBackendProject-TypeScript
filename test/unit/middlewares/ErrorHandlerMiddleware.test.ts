@@ -21,7 +21,7 @@ describe('ErrorHandlerMiddleware', () => {
         middleware.isProduction = true;
         middleware.error(err, undefined, res, undefined);
         const json = res._getJSON();
-        expect(json.name).toBe(err.name);
+        expect(json.status).toBe(err.httpCode);
         expect(json.message).toBe(err.message);
         expect(log.errorMock).toHaveBeenCalledWith(err.name, [err.message]);
     });
@@ -30,7 +30,7 @@ describe('ErrorHandlerMiddleware', () => {
         middleware.isProduction = false;
         middleware.error(err, undefined, res, undefined);
         const json = res._getJSON();
-        expect(json.name).toBe(err.name);
+        expect(json.status).toBe(err.httpCode);
         expect(json.message).toBe(err.message);
         expect(log.errorMock).toHaveBeenCalled();
     });

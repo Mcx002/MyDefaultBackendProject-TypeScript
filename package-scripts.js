@@ -161,7 +161,7 @@ module.exports = {
                 script: series(
                     'nps db.drop',
                     'nps db.migrate',
-                    // 'nps db.seed'
+                    'nps db.seed'
                 ),
                 description: 'Recreates the database with seeded data'
             }

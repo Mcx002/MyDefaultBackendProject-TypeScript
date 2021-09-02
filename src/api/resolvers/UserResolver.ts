@@ -1,7 +1,5 @@
-import { FieldResolver, Query, Resolver, Root } from 'type-graphql';
+import { Query, Resolver } from 'type-graphql';
 import { Service } from 'typedi';
-
-import { User as UserModel } from '../models/User';
 import { UserService } from '../services/UserService';
 import { User } from '../types/User';
 
@@ -10,13 +8,11 @@ import { User } from '../types/User';
 export class UserResolver {
 
     constructor(
-        private userService: UserService,
+        private userService: UserService
         ) {}
 
     @Query(returns => [User])
     public users(): Promise<any> {
       return this.userService.find();
     }
-
-
 }

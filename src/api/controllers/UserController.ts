@@ -4,16 +4,14 @@ import {
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 import { UserNotFoundError } from '../errors/UserNotFoundError';
-import { User } from '../models/User';
+import {User} from '../models/User';
 import { UserService } from '../services/UserService';
 import {UserResponse} from './responses/UserResponses';
 import {BaseUser, CreateUserBody} from './requests/UserRequests';
 
-
-
 @Authorized()
 @JsonController('/users')
-@OpenAPI({ security: [{ basicAuth: [] }] })
+@OpenAPI({ security: [{ bearerAuth: [] }] })
 export class UserController {
 
     constructor(
@@ -65,8 +63,10 @@ export class UserController {
     }
 
     @Delete('/:id')
-    public delete(@Param('id') id: string): Promise<void> {
-        return this.userService.delete(id);
+    @OnUndefined(200)
+    public async delete(@Param('id') id: string): Promise<void> {
+        await this.userService.delete(id);
+        return ;
     }
 
 }

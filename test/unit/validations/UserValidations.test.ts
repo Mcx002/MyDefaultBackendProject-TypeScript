@@ -1,6 +1,6 @@
-import { validate } from 'class-validator';
+import {validate} from 'class-validator';
 
-import { User } from '../../../src/api/models/User';
+import {User, UserStat} from '../../../src/api/models/User';
 
 describe('UserValidations', () => {
 
@@ -38,6 +38,7 @@ describe('UserValidations', () => {
         user.email = 'test@test.com';
         user.username = 'test';
         user.password = '1234';
+        user.user_stat = UserStat.member;
         const errors = await validate(user);
         expect(errors.length).toEqual(0);
         done();

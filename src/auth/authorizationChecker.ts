@@ -17,7 +17,7 @@ export function authorizationChecker(connection: Connection): (action: Action, r
         // either promise that resolves a boolean value
 
         // basic auth
-        // const credentials = authService.parseAuthFromRequest(action.request);
+        const credentials = await authService.parseAuthFromRequest(action.request);
         //
         // if (credentials === undefined) {
         //     log.warn('No credentials given');
@@ -27,7 +27,7 @@ export function authorizationChecker(connection: Connection): (action: Action, r
         // action.request.user = await authService.validateUser(credentials.username, credentials.password);
 
         // bearer auth
-        action.request.user = await authService.parseAuthFromRequest(action.request, roles);
+        action.request.user = await authService.validateUser(credentials.id, roles);
         if (action.request.user === undefined) {
             log.warn('Invalid credentials given');
             return false;

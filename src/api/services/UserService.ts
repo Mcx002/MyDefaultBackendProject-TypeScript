@@ -7,6 +7,7 @@ import { Logger, LoggerInterface } from '../../decorators/Logger';
 import { User } from '../models/User';
 import { UserRepository } from '../repositories/UserRepository';
 import { events } from '../subscribers/events';
+import {ServerError} from '../errors/ServerError';
 
 @Service()
 export class UserService {
@@ -35,15 +36,21 @@ export class UserService {
         return newUser;
     }
 
-    public update(id: string, user: User): Promise<User> {
+    public async update(id: string, user: User): Promise<User> {
         this.log.info('Update a user');
         user.id = id;
+        if (!await this.userRepository.findOne(user.id)) {
+            throw new ServerError('The id is not found', 404);
+        }
         return this.userRepository.save(user);
     }
 
     public async delete(id: string): Promise<void> {
         this.log.info('Delete a user');
-        await this.userRepository.delete(id);
+        const data = await this.userRepository.delete(id);
+        if (data.raw.affectedRows === 0) {
+            throw new ServerError('The id is not found', 404);
+        }
         return;
     }
 
